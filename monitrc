@@ -1,0 +1,11 @@
+set daemon 10 with start delay 60
+set idfile /srv/tmp/.monit.id
+set log /srv/log/monit.log
+set onreboot laststate
+set pidfile /srv/run/monit.pid
+set statefile /srv/run/.monit.state
+
+set httpd port 2812
+  allow admin:admin
+
+check system $HOST

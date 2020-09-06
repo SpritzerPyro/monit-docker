@@ -1,0 +1,29 @@
+#!/bin/sh
+
+set -euo pipefail
+
+function check_pid() {
+  local pid=$(pidof monit)
+
+  if [[ "${pid}" != "1" ]]; then
+    exit 1
+  fi
+}
+
+function check_port() {
+  set +e
+  curl -I localhost:2812 &> /dev/null
+  local result="$?"
+  set -e
+
+  if [[ "${result}" != "0" ]]; then
+    exit 1
+  fi
+}
+
+function main() {
+  check_pid
+  check_port
+}
+
+main "$@"

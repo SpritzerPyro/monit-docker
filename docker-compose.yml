@@ -1,0 +1,9 @@
+version: '3.6'
+
+services:
+  monit:
+    build:
+      args:
+        monit_version: ${MONIT_VERSION}
+      context: .
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
