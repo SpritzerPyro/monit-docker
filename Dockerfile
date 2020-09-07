@@ -38,7 +38,9 @@ RUN addgroup monit docker && addgroup monit ping
 
 EXPOSE 2812
 
+COPY assets/entrypoint /usr/local/bin/entrypoint
 COPY assets/healthcheck /usr/local/bin/healthcheck
+COPY --chown=1000:1000 assets/monitrc /srv/assets/monitrc
 
 HEALTHCHECK \
   --interval=5s \
@@ -47,12 +49,15 @@ HEALTHCHECK \
   --timeout=20s \
   CMD [ "healthcheck" ]
 
-COPY --chown=1000:1000 assets/monitrc /home/monit/.monitrc
+RUN ln -s /srv/assets/monitrc /home/monit/.monitrc \
+  && chmod 644 /home/monit/.monitrc
+
+ENTRYPOINT [ "entrypoint" ]
 
 VOLUME [ "/srv/run" ]
 
 USER monit
 
-WORKDIR /srv/app
+WORKDIR /home/monit
 
 CMD ["monit", "-I"]

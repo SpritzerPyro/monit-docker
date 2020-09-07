@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -euo pipefail
+
+function link_monitrc() {
+  local source="${MONITRC_PATH:-/srv/assets/monitrc}"
+  local target="${HOME}/.monitrc"
+
+  echo "Create symbolic link from '${source}' to '${target}'"
+
+  ln -fs "${source}" "${target}"
+}
+
+function main() {
+  link_monitrc
+
+  exec "$@"
+}
+
+main "$@"
