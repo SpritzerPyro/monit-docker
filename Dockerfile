@@ -37,7 +37,7 @@ RUN addgroup monit docker && addgroup monit ping
 
 EXPOSE 2812
 
-COPY healthcheck /usr/local/bin/healthcheck
+COPY assets/healthcheck /usr/local/bin/healthcheck
 
 HEALTHCHECK \
   --interval=5s \
@@ -46,7 +46,7 @@ HEALTHCHECK \
   --timeout=20s \
   CMD [ "healthcheck" ]
 
-COPY --chown=1000:1000 monitrc /srv/app/.monitrc
+COPY --chown=1000:1000 assets/monitrc /srv/app/.monitrc
 
 VOLUME [ "/srv/run" ]
 
