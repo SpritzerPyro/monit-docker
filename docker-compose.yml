@@ -4,6 +4,7 @@ services:
   monit:
     build:
       args:
+        alpine_tag: ${ALPINE_TAG}
         monit_version: ${MONIT_VERSION}
       context: .
     image: ${IMAGE_NAME}:${IMAGE_TAG}

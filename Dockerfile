@@ -1,6 +1,6 @@
-ARG ALPINE_TAG=latest
+ARG alpine_tag=latest
 
-FROM alpine:${ALPINE_TAG}
+FROM alpine:${alpine_tag}
 
 ARG monit_version
 
