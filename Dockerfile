@@ -46,7 +46,7 @@ HEALTHCHECK \
   --timeout=20s \
   CMD [ "healthcheck" ]
 
-COPY --chown=1000:1000 assets/monitrc /srv/app/.monitrc
+COPY --chown=1000:1000 assets/monitrc /home/monit/.monitrc
 
 VOLUME [ "/srv/run" ]
 
