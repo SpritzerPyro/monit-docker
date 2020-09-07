@@ -12,6 +12,7 @@ RUN for i in \
   /srv/configs \
   /srv/log \
   /srv/run \
+  /srv/tmp \
   /srv/var \
   ; do mkdir -p $i && chown -R 1000:1000 $i; done
 
