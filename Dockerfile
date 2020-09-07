@@ -15,7 +15,15 @@ RUN for i in \
   /srv/var \
   ; do mkdir -p $i && chown -R 1000:1000 $i; done
 
-RUN apk --no-cache --update add curl g++ gcc make openssl-dev zlib-dev
+RUN apk --no-cache add \
+  curl \
+  docker \
+  docker-compose \
+  g++ \
+  gcc \
+  make \
+  openssl-dev \
+  zlib-dev
 
 RUN cd /srv/tmp && \
   curl https://mmonit.com/monit/dist/monit-${monit_version}.tar.gz | tar xz && \
@@ -24,6 +32,8 @@ RUN cd /srv/tmp && \
   make && \
   make install && \
   rm -rf /srv/tmp/monit-${monit_version}
+
+RUN addgroup monit docker && addgroup monit ping
 
 EXPOSE 2812
 

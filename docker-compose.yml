@@ -8,3 +8,5 @@ services:
         monit_version: ${MONIT_VERSION}
       context: .
     image: ${IMAGE_NAME}:${IMAGE_TAG}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
