@@ -4,14 +4,14 @@ FROM alpine:${alpine_tag}
 
 ARG monit_version
 
-RUN addgroup -g 1000 monit && adduser -D -G monit -h /srv/app -u 1000 monit
+RUN addgroup -g 1000 monit && adduser -D -G monit -u 1000 monit
 
 RUN for i in \
-  /srv/app \
+  /srv/assets \
+  /srv/bin \
+  /srv/configs \
   /srv/log \
-  /srv/monit \
   /srv/run \
-  /srv/tmp \
   /srv/var \
   ; do mkdir -p $i && chown -R 1000:1000 $i; done
 
