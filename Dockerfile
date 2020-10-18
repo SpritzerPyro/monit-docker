@@ -4,6 +4,10 @@ FROM alpine:${alpine_tag}
 
 ARG monit_version
 
+LABEL "alpine.tag"=${alpine_tag}
+LABEL "monit.id"="spritzerpyro-monit-docker"
+LABEL "monit.version"=${monit_version}
+
 RUN addgroup -g 1000 monit && adduser -D -G monit -s /bin/bash -u 1000 monit
 
 RUN for i in \
