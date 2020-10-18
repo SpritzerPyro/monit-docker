@@ -1,18 +1,51 @@
-#!/bin/sh
+#!/bin/bash
 
 set -euo pipefail
 
+function create_monitrc() {
+  local -r daemon="${MONIT_DAEMON:-1}"
+  local delay="${MONIT_DELAY:-""}"
+  local -r host="${MONIT_HOST:-host}"
+  local -r log="${MONIT_LOG:-/srv/log/monit.log}"
+  local -r onreboot="${MONIT_ONREBOOT:-laststate}"
+  local -r pass="${MONIT_PASSWORD:-admin}"
+  local -r user="${MONIT_USERNAME:-admin}"
+
+  if [[ "${delay}" ]]; then
+    delay=" with start delay ${delay}"
+  fi
+
+  echo "set daemon ${daemon}${delay}" > "${target}"
+  echo "set log ${log}" >> "${target}"
+  echo "set onreboot ${onreboot}" >> "${target}"
+  echo "set statefile /srv/run/.monit.state" >> "${target}"
+  echo "" >> "${target}"
+  echo "set httpd port 2812" >> "${target}"
+  echo "  allow ${user}:${pass}" >> "${target}"
+  echo "" >> "${target}"
+  echo 'check system $HOST' >> "${target}"
+  echo "" >> "${target}"
+  echo "include /srv/configs/*.cfg" >> "${target}"
+  echo "include /srv/configs/**/*.cfg" >> "${target}"
+  echo "" >> "${target}"
+}
+
 function link_monitrc() {
-  local source="${MONITRC_PATH:-/srv/assets/monitrc}"
-  local target="${HOME}/.monitrc"
+  echo "Create symbolic link from '${MONIT_RC_PATH}' to '${target}'"
 
-  echo "Create symbolic link from '${source}' to '${target}'"
-
-  ln -fs "${source}" "${target}"
+  ln -fs "${MONIT_RC_PATH}" "${target}"
 }
 
 function main() {
-  link_monitrc
+  readonly target="${HOME}/.monitrc"
+
+  if [[ "${MONIT_RC_PATH-}" ]]; then
+    link_monitrc
+  else
+    create_monitrc
+  fi
+
+  chmod 600 "${target}"
 
   exec "$@"
 }

@@ -1,9 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 set -euo pipefail
 
 function check_pid() {
-  local pid=$(pidof monit)
+  local -r pid=$(pidof monit)
 
   if [[ "${pid}" != "1" ]]; then
     exit 1
@@ -12,9 +12,9 @@ function check_pid() {
 
 function check_port() {
   set +e
-  curl -I localhost:2812 &> /dev/null
+  curl -I 0.0.0.0:2812 &> /dev/null
   local result="$?"
-  set -e
+  set -euo pipefail
 
   if [[ "${result}" != "0" ]]; then
     exit 1

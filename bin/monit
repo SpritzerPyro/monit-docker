@@ -1,0 +1,70 @@
+#!/bin/bash
+
+set -euo pipefail
+
+function dmonit::find() {
+  echo $(dmonit::ls) | awk '{ print $1 }'
+}
+
+function dmonit::healthy() {
+  local -r status=$(dmonit::inspect "Status" "$@")
+  local -r health=$(dmonit::inspect "Health.Status" "$@")
+
+  if [[ "${status}" != "restarting" ]] && [[ "${status}" != "running" ]]; then
+    return 1
+  fi
+
+  [[ "${health}" != "unhealthy" ]]
+}
+
+function dmonit::inspect() {
+  docker container inspect --format "{{lower .State.$1}}" "${@:2}" 2> /dev/null
+}
+
+function dmonit::ls() {
+  docker container ls \
+    --filter "label=monit.id=spritzerpyro-monit-docker" \
+    --format "{{.ID}}"
+}
+
+function main() {
+  local flag OPTARG OPTIND
+  local container="${MONIT_DOCKER_CONTAINER:-$(dmonit::find)}"
+  local args=(--color)
+  local watch=0
+
+  function usage() {
+    echo "Usage: $(basename "$0") [OPTIONS]"
+    echo ""
+    echo "Options:"
+    echo "  -c CONTAINER  Specify monit docker container"
+    echo "  -d            Highlight changes in watch mode (-w)"
+    echo "  -h            Show this information"
+    echo "  -w            Watch output"
+  }
+
+  while getopts 'c:dhw' flag; do
+    case "${flag}" in
+      c) container="${OPTARG}" ;;
+      d) args+=(--differences) ;;
+      h) usage && exit 0 ;;
+      w) watch=1 ;;
+      *) usage && exit 1 ;;
+    esac
+  done
+
+  shift $(( ${OPTIND} - 1 ))
+
+  if ! dmonit::healthy "${container}"; then
+    echo "Docker container '${container:-"not specified"}' is not healthy" >&2
+    exit 1
+  fi
+
+  if (( ${watch} )); then
+    watch "${args[@]}" "docker exec -t ${container} monit ${@:-summary}"
+  else
+    docker exec -t "${container}" monit "$@"
+  fi
+}
+
+main "$@"
