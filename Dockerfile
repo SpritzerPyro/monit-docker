@@ -4,7 +4,7 @@ FROM alpine:${alpine_tag}
 
 ARG monit_version
 
-RUN addgroup -g 1000 monit && adduser -D -G monit -u 1000 monit
+RUN addgroup -g 1000 monit && adduser -D -G monit -s /bin/bash -u 1000 monit
 
 RUN for i in \
   /srv/assets \
@@ -17,6 +17,7 @@ RUN for i in \
   ; do mkdir -p $i && chown -R 1000:1000 $i; done
 
 RUN apk --no-cache add \
+  bash \
   curl \
   docker \
   docker-compose \
@@ -24,6 +25,7 @@ RUN apk --no-cache add \
   gcc \
   make \
   openssl-dev \
+  tzdata \
   zlib-dev
 
 RUN cd /srv/tmp && \
