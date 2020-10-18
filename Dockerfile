@@ -7,7 +7,6 @@ ARG monit_version
 RUN addgroup -g 1000 monit && adduser -D -G monit -s /bin/bash -u 1000 monit
 
 RUN for i in \
-  /srv/assets \
   /srv/bin \
   /srv/configs \
   /srv/log \
@@ -42,17 +41,13 @@ EXPOSE 2812
 
 COPY assets/entrypoint /usr/local/bin/entrypoint
 COPY assets/healthcheck /usr/local/bin/healthcheck
-COPY --chown=1000:1000 assets/monitrc /srv/assets/monitrc
 
 HEALTHCHECK \
   --interval=5s \
   --retries=3 \
-  --start-period=120s \
+  --start-period=10s \
   --timeout=20s \
   CMD [ "healthcheck" ]
-
-RUN ln -s /srv/assets/monitrc /home/monit/.monitrc \
-  && chmod 644 /home/monit/.monitrc
 
 ENTRYPOINT [ "entrypoint" ]
 
