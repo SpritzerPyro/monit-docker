@@ -18,7 +18,6 @@ function create_monitrc() {
   echo "set daemon ${daemon}${delay}" > "${target}"
   echo "set log ${log}" >> "${target}"
   echo "set onreboot ${onreboot}" >> "${target}"
-  echo "set pidfile /srv/run/monit.pid" >> "${target}"
   echo "set statefile /srv/run/.monit.state" >> "${target}"
   echo "" >> "${target}"
   echo "set httpd port 2812" >> "${target}"
@@ -27,6 +26,7 @@ function create_monitrc() {
   echo 'check system $HOST' >> "${target}"
   echo "" >> "${target}"
   echo "include /srv/configs/*.cfg" >> "${target}"
+  echo "include /srv/configs/**/*.cfg" >> "${target}"
   echo "" >> "${target}"
 }
 
