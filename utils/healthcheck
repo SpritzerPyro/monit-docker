@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -euo pipefail
+
+function inspect() {
+  docker container inspect --format "{{lower .State.$1}}" "${@:2}" 2> /dev/null
+}
+
+function main() {
+  local -r status=$(inspect "Status" "$@")
+  local -r health=$(inspect "Health.Status" "$@")
+
+  echo "Docker healthcheck"
+  echo "Container: \`$@\`, Status: \`${status:-"-"}\`, Health: \`${health:-"-"}\`"
+
+  if [[ "${status}" != "restarting" ]] && [[ "${status}" != "running" ]]; then
+    return 1
+  fi
+
+  [[ "${health}" != "unhealthy" ]]
+}
+
+main "$@"

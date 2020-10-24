@@ -3,7 +3,7 @@
 set -euo pipefail
 
 function create_monitrc() {
-  local -r daemon="${MONIT_DAEMON:-1}"
+  local -r daemon="${MONIT_DAEMON:-5}"
   local delay="${MONIT_DELAY:-""}"
   local -r host="${MONIT_HOST:-host}"
   local -r log="${MONIT_LOG:-/srv/log/monit.log}"

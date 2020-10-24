@@ -4,9 +4,10 @@ FROM alpine:${alpine_tag}
 
 ARG monit_version
 
-LABEL "alpine.tag"=${alpine_tag}
-LABEL "monit.id"="spritzerpyro-monit-docker"
-LABEL "monit.version"=${monit_version}
+LABEL alpine.tag ${alpine_tag}
+LABEL monit.id spritzerpyro-monit-docker
+LABEL monit.version ${monit_version}
+LABEL org.opencontainers.image.source https://github.com/SpritzerPyro/monit-docker
 
 RUN addgroup -g 1000 monit && adduser -D -G monit -s /bin/bash -u 1000 monit
 
@@ -45,6 +46,8 @@ EXPOSE 2812
 
 COPY assets/entrypoint /usr/local/bin/entrypoint
 COPY assets/healthcheck /usr/local/bin/healthcheck
+
+COPY --chown=1000:1000 utils/* /srv/bin/
 
 HEALTHCHECK \
   --interval=5s \
