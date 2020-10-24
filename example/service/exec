@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -euo pipefail
+
+function main() {
+  local flag OPTARG OPTIND
+  local mode=start
+  local -r script_dir=$(readlink -f $(dirname "$0"))
+  local -r working_dir=$(pwd)
+
+  while getopts 'x' flag; do
+    case "${flag}" in
+      x) mode=stop ;;
+      *) exit 1 ;;
+    esac
+  done
+
+  shift $(( ${OPTIND} - 1 ))
+
+  cd "${script_dir}"
+
+  if [[ "${mode}" == "stop" ]]; then
+    docker-compose down
+  else
+    docker-compose up -d
+  fi
+
+  cd "${working_dir}"
+}
+
+main "$@"

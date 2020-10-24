@@ -1,0 +1,21 @@
+version: '3.6'
+
+services:
+  monit:
+    environment:
+      MONIT_PASSWORD: 'foobar'
+      TZ: 'Europe/Vienna'
+    hostname: 'monit-docker-host'
+    image: ghcr.io/spritzerpyro/monit:1.0.0
+    ports:
+      - 2812:2812
+    volumes:
+      - ./configs:/srv/configs:ro
+      - ./log:/srv/log
+      - ./service:/srv/var/service:ro
+      - /dev/sda2:/dev/sda2:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - run:/srv/run
+
+volumes:
+  run:
