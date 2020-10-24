@@ -1,0 +1,126 @@
+#!/bin/bash
+
+set -euo pipefail
+
+function monit_action() {
+  if [[ ! "${action}" ]]; then
+    return
+  fi
+
+  echo "Execute action '${action}' for service '${monit_service}"
+
+  /usr/local/bin/monit "${action}" "${monit_service}"
+}
+
+function payload() {
+cat << END_PAYLOAD
+{
+  "attachments": [
+    {
+      "color": "${color}",
+      "blocks": [
+        {
+          "type": "header",
+          "text": {
+            "type": "plain_text",
+            "text": "${emoji}${monit_service}",
+            "emoji": true
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Host\t\`${monit_host}\`\nDate\t\`${monit_date}\` (${TZ})"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*${monit_event}:* ${monit_description}"
+          }
+        }
+      ]
+    }
+  ]
+}
+END_PAYLOAD
+}
+
+function send() {
+  echo "Send slack message for service '${monit_service}'"
+
+  curl -X POST -H 'Content-type: application/json' \
+    --data "$(payload)" \
+    https://hooks.slack.com/services/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
+
+  echo ""
+}
+
+function set_color() {
+  if [[ "${color}" ]]; then
+    return
+  fi
+
+  if [[ "${monit_event}" == *"succeeded"* ]]; then
+    color="#007a5a"
+  elif [[ "${monit_event}" == *"failed"* ]]; then
+    color="#e01e5a"
+  fi
+}
+
+function set_emoji() {
+  if [[ "${emoji}" ]]; then
+    return
+  fi
+
+  if [[ "${monit_event}" == *"succeeded"* ]]; then
+    emoji=":green_heart:    "
+  elif [[ "${monit_event}" == *"failed"* ]]; then
+    emoji=":broken_heart:    "
+  fi
+}
+
+function usage() {
+  echo "Usage: $(basename "$0") [OPTIONS]"
+  echo ""
+  echo "Options:"
+  echo "  -a -e -m  Monit action after sending (optional)"
+  echo "  -c        Custom slack or hex color (optional)"
+  echo "  -h        Show this information"
+  echo "  -j        Custom header emoji (optional)"
+}
+
+function main() {
+  action=""
+  color="${MONIT_COLOR:-""}"
+  emoji="${MONIT_EMOJI:-""}"
+  monit_date="${MONIT_DATE:-$(date +x"%Y-%m-%dT%H:%M:%S.%3N%:z")}"
+  monit_description="${MONIT_DESCRIPTION:-""}"
+  monit_event="${MONIT_EVENT:-"Unknown event"}"
+  monit_host="${MONIT_HOST:-"${HOSTNAME:-"Hostname missing"}"}"
+  monit_service="${MONIT_SERVICE:-"Unknown service"}"
+  local flag OPTARG OPTIND
+
+  while getopts 'a:c:e:hj:m:' flag; do
+    case "${flag}" in
+      a|e|m) action="${OPTARG}" ;;
+      c) color="${OPTARG}" ;;
+      h) usage && exit 0 ;;
+      j) emoji="${OPTARG}" ;;
+      *) usage && exit 1 ;;
+    esac
+  done
+
+  shift $(( ${OPTIND} - 1 ))
+
+  echo "$action"
+
+  set_color
+  set_emoji
+  send
+  monit_action
+}
+
+main "$@"
