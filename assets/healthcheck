@@ -10,6 +10,8 @@ function main() {
   local -r status=$(inspect "Status" "$@")
   local -r health=$(inspect "Health.Status" "$@")
 
+  echo "Container '$@': status: '${status}', health: '${health}'"
+
   if [[ "${status}" != "restarting" ]] && [[ "${status}" != "running" ]]; then
     return 1
   fi
