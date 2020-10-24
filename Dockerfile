@@ -45,6 +45,8 @@ EXPOSE 2812
 
 COPY assets/monit_docker_entrypoint /usr/local/bin/monit_docker_entrypoint
 COPY assets/monit_docker_healthcheck /usr/local/bin/monit_docker_healthcheck
+
+COPY assets/healthcheck /usr/local/bin/healthcheck
 COPY assets/slack /usr/local/bin/slack
 
 HEALTHCHECK \
