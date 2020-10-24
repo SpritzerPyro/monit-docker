@@ -2,21 +2,28 @@
 
 set -euo pipefail
 
-function inspect() {
-  docker container inspect --format "{{lower .State.$1}}" "${@:2}" 2> /dev/null
+function check_pid() {
+  local -r pid=$(pidof monit)
+
+  if [[ "${pid}" != "1" ]]; then
+    exit 1
+  fi
+}
+
+function check_port() {
+  set +e
+  curl -I 0.0.0.0:2812 &> /dev/null
+  local result="$?"
+  set -euo pipefail
+
+  if [[ "${result}" != "0" ]]; then
+    exit 1
+  fi
 }
 
 function main() {
-  local -r status=$(inspect "Status" "$@")
-  local -r health=$(inspect "Health.Status" "$@")
-
-  echo "Container '$@': status: '${status}', health: '${health}'"
-
-  if [[ "${status}" != "restarting" ]] && [[ "${status}" != "running" ]]; then
-    return 1
-  fi
-
-  [[ "${health}" != "unhealthy" ]]
+  check_pid
+  check_port
 }
 
 main "$@"

@@ -31,7 +31,7 @@ cat << END_PAYLOAD
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "Host\t\`${monit_host}\`\nDate\t\`${monit_date}\` (${TZ})"
+            "text": "Host\t\`${monit_host}\`\nDate\t\`${monit_date}\`\t${TZ}"
           }
         },
         {
@@ -96,7 +96,7 @@ function main() {
   action=""
   color="${MONIT_COLOR:-""}"
   emoji="${MONIT_EMOJI:-""}"
-  monit_date="${MONIT_DATE:-$(date +x"%Y-%m-%dT%H:%M:%S.%3N%:z")}"
+  monit_date="${MONIT_DATE:-$(date +"%Y-%m-%dT%H:%M:%S%z")}"
   monit_description="${MONIT_DESCRIPTION:-""}"
   monit_event="${MONIT_EVENT:-"Unknown event"}"
   monit_host="${MONIT_HOST:-"${HOSTNAME:-"Hostname missing"}"}"
