@@ -43,8 +43,8 @@ RUN addgroup monit docker && addgroup monit ping
 
 EXPOSE 2812
 
-COPY assets/entrypoint /usr/local/bin/monit_docker_entrypoint
-COPY assets/healthcheck /usr/local/bin/monit_docker_healthcheck
+COPY assets/monit_docker_entrypoint /usr/local/bin/monit_docker_entrypoint
+COPY assets/monit_docker_healthcheck /usr/local/bin/monit_docker_healthcheck
 COPY assets/slack /usr/local/bin/slack
 
 HEALTHCHECK \
