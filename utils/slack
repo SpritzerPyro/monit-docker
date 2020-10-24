@@ -49,11 +49,17 @@ END_PAYLOAD
 }
 
 function send() {
+  if [[ ! "${webhook}" ]]; then
+    echo "slack: cannot send message because webhook url is not set"
+
+    return
+  fi
+
   echo "Send slack message for service '${monit_service}'"
 
   curl -X POST -H 'Content-type: application/json' \
     --data "$(payload)" \
-    https://hooks.slack.com/services/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
+    "${webhook}"
 
   echo ""
 }
@@ -101,21 +107,21 @@ function main() {
   monit_event="${MONIT_EVENT:-"Unknown event"}"
   monit_host="${MONIT_HOST:-"${HOSTNAME:-"Hostname missing"}"}"
   monit_service="${MONIT_SERVICE:-"Unknown service"}"
+  webhook="${SLACK_WEBHOOK:-""}"
   local flag OPTARG OPTIND
 
-  while getopts 'a:c:e:hj:m:' flag; do
+  while getopts 'a:c:e:hj:m:w:' flag; do
     case "${flag}" in
       a|e|m) action="${OPTARG}" ;;
       c) color="${OPTARG}" ;;
       h) usage && exit 0 ;;
       j) emoji="${OPTARG}" ;;
+      w) webhook="${OPTARG}" ;;
       *) usage && exit 1 ;;
     esac
   done
 
   shift $(( ${OPTIND} - 1 ))
-
-  echo "$action"
 
   set_color
   set_emoji

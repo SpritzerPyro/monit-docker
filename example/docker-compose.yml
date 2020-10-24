@@ -4,6 +4,7 @@ services:
   monit:
     environment:
       MONIT_PASSWORD: 'foobar'
+      SLACK_WEBHOOK: ${SLACK_WEBHOOK}
       TZ: 'Europe/Vienna'
     hostname: 'monit-docker-host'
     image: ghcr.io/spritzerpyro/monit:1.0.0
