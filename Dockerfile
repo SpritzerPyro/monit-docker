@@ -43,17 +43,18 @@ RUN addgroup monit docker && addgroup monit ping
 
 EXPOSE 2812
 
-COPY assets/entrypoint /usr/local/bin/entrypoint
-COPY assets/healthcheck /usr/local/bin/healthcheck
+COPY assets/entrypoint /usr/local/bin/monit_docker_entrypoint
+COPY assets/healthcheck /usr/local/bin/monit_docker_healthcheck
+COPY assets/slack /usr/local/bin/slack
 
 HEALTHCHECK \
   --interval=5s \
   --retries=3 \
   --start-period=10s \
   --timeout=20s \
-  CMD [ "healthcheck" ]
+  CMD [ "monit_docker_healthcheck" ]
 
-ENTRYPOINT [ "entrypoint" ]
+ENTRYPOINT [ "monit_docker_entrypoint" ]
 
 VOLUME [ "/srv/run" ]
 
