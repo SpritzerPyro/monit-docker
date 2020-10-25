@@ -3,7 +3,7 @@ version: '3.6'
 services:
   monit:
     environment:
-      MONIT_PASSWORD: 'foobar'
+      MONIT_PASSWORD: ${MONIT_PASSWORD}
       SLACK_WEBHOOK: ${SLACK_WEBHOOK}
       TZ: 'Europe/Vienna'
     hostname: 'monit-docker-host'
