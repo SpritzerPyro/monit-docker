@@ -69,9 +69,9 @@ function set_color() {
     return
   fi
 
-  if [[ "${monit_event}" == *"succeeded"* ]]; then
+  if [[ "${state}" == "success" ]]; then
     color="#007a5a"
-  elif [[ "${monit_event}" == *"failed"* ]]; then
+  elif [[ "${state}" == "failure" ]]; then
     color="#e01e5a"
   fi
 }
@@ -81,11 +81,29 @@ function set_emoji() {
     return
   fi
 
-  if [[ "${monit_event}" == *"succeeded"* ]]; then
+  if [[ "${state}" == "success" ]]; then
     emoji=":green_heart:    "
-  elif [[ "${monit_event}" == *"failed"* ]]; then
+  elif [[ "${state}" == "failure" ]]; then
     emoji=":broken_heart:    "
   fi
+}
+
+function set_state() {
+  for i in ${!monit_failure_states[@]}; do
+    if [[ "${monit_failure_states[$i]}" == "${monit_event}" ]]; then
+      state="failure"
+
+      return
+    fi
+  done
+
+  for i in ${!monit_success_states[@]}; do
+    if [[ "${monit_success_states[$i]}" == "${monit_event}" ]]; then
+      state="success"
+
+      return
+    fi
+  done
 }
 
 function usage() {
@@ -99,6 +117,7 @@ function usage() {
 }
 
 function main() {
+  local -r script_dir=$(dirname $(readlink -f "$0"))
   action=""
   color="${MONIT_COLOR:-""}"
   emoji="${MONIT_EMOJI:-""}"
@@ -107,6 +126,7 @@ function main() {
   monit_event="${MONIT_EVENT:-"Unknown event"}"
   monit_host="${MONIT_HOST:-"${HOSTNAME:-"Hostname missing"}"}"
   monit_service="${MONIT_SERVICE:-"Unknown service"}"
+  state=""
   webhook="${SLACK_WEBHOOK:-""}"
   local flag OPTARG OPTIND
 
@@ -123,6 +143,9 @@ function main() {
 
   shift $(( ${OPTIND} - 1 ))
 
+  source "${script_dir}/monit.sh"
+
+  set_state
   set_color
   set_emoji
   send
