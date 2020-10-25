@@ -30,7 +30,6 @@ function dmonit::ls() {
 function main() {
   local flag OPTARG OPTIND
   local container="${MONIT_DOCKER_CONTAINER:-$(dmonit::find)}"
-  local args=(--color)
   local watch=0
 
   function usage() {
@@ -38,7 +37,6 @@ function main() {
     echo ""
     echo "Options:"
     echo "  -c CONTAINER  Specify monit docker container"
-    echo "  -d            Highlight changes in watch mode (-w)"
     echo "  -h            Show this information"
     echo "  -w            Watch output"
   }
@@ -46,7 +44,6 @@ function main() {
   while getopts 'c:dhw' flag; do
     case "${flag}" in
       c) container="${OPTARG}" ;;
-      d) args+=(--differences) ;;
       h) usage && exit 0 ;;
       w) watch=1 ;;
       *) usage && exit 1 ;;
@@ -61,7 +58,7 @@ function main() {
   fi
 
   if (( ${watch} )); then
-    watch "${args[@]}" "docker exec -t ${container} monit ${@:-summary}"
+    docker exec --tty "${container}" watch -t monit "${@:-summary}"
   else
     docker exec -t "${container}" monit "$@"
   fi
