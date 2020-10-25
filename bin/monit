@@ -27,19 +27,40 @@ function dmonit::ls() {
     --format "{{.ID}}"
 }
 
+  function usage() {
+    echo "Usage: $(basename "$0") [OPTIONS] command"
+    echo ""
+    echo "The command is executed in the first found monit-docker container."
+    echo ""
+    echo "Options:"
+    echo "  -c CONTAINER  Specify different container"
+    echo "  -h            Show this information"
+    echo "  -w            Watch output"
+    echo ""
+    echo "Monit commands"
+    echo "  start all            Start all services"
+    echo "  start <name>         Only start the named service"
+    echo "  stop all             Stop all services"
+    echo "  stop <name>          Stop the named service"
+    echo "  restart all          Stop and start all services"
+    echo "  restart <name>       Only restart the named service"
+    echo "  monitor all          Enable monitoring of all services"
+    echo "  monitor <name>       Only enable monitoring of the named service"
+    echo "  unmonitor all        Disable monitoring of all services"
+    echo "  unmonitor <name>     Only disable monitoring of the named service"
+    echo "  reload               Reinitialize monit"
+    echo "  status [name]        Print full status information for service(s)"
+    echo "  summary [name]       Print short status information for service(s)"
+    echo "  report [up|down|..]  Report state of services. See manual for options"
+    echo "  quit                 Kill the monit daemon process"
+    echo "  validate             Check all services and start if not running"
+    echo "  procmatch <pattern>  Test process matching pattern"
+  }
+
 function main() {
   local flag OPTARG OPTIND
   local container="${MONIT_DOCKER_CONTAINER:-$(dmonit::find)}"
   local watch=0
-
-  function usage() {
-    echo "Usage: $(basename "$0") [OPTIONS]"
-    echo ""
-    echo "Options:"
-    echo "  -c CONTAINER  Specify monit docker container"
-    echo "  -h            Show this information"
-    echo "  -w            Watch output"
-  }
 
   while getopts 'c:dhw' flag; do
     case "${flag}" in
