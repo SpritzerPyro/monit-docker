@@ -1,0 +1,66 @@
+#!/bin/bash
+
+set -euo pipefail
+
+function build() {
+  local -r image="${IMAGE_NAME}:${IMAGE_TAG}"
+  local -r working_dir=$(pwd)
+
+  cd "${working_dir}"
+
+  docker-compose build
+
+  cd "${script_dir}"
+
+  if (( ${latest} )); then
+    docker image tag "${image}" "${IMAGE_NAME}:latest"
+  fi
+}
+
+
+function deploy() {
+  docker image push "${IMAGE_NAME}:${IMAGE_TAG}"
+
+
+  if (( ${latest} )); then
+    docker image push "${IMAGE_NAME}:latest"
+  fi
+}
+
+function usage() {
+  echo "Usage: $(basename "$0") [OPTIONS]"
+  echo ""
+  echo "Options:"
+  echo "  -d -p  Push image after creation"
+  echo "  -h     Show this information"
+  echo "  -l     Also create 'latest' image tag"
+}
+
+function main() {
+  readonly script_dir=$(dirname $(readlink -f "${BASH_SOURCE[0]}"))
+  deploy=0
+  latest=0
+
+  local flag OPTARG OPTIND
+
+  while getopts 'dhlp' flag; do
+    case "${flag}" in
+      d|p) deploy=1 ;;
+      h) usage && exit 0 ;;
+      l) latest=1 ;;
+      *) usage && exit 1 ;;
+    esac
+  done
+
+  shift $(( ${OPTIND} - 1 ))
+
+  source "${script_dir}/../.env"
+
+  build
+
+  if (( ${deploy} )); then
+    deploy
+  fi
+}
+
+main "$@"
