@@ -10,6 +10,7 @@ services:
     image: ghcr.io/spritzerpyro/monit:1.0.0
     ports:
       - 2812:2812
+    restart: always
     volumes:
       - ./configs:/srv/configs:ro
       - ./log:/srv/log
