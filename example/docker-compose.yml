@@ -9,7 +9,7 @@ services:
     hostname: 'monit-docker-host'
     image: ghcr.io/spritzerpyro/monit:1.0.0
     ports:
-      - 2812:2812
+      - 80:80
     restart: always
     volumes:
       - ./configs:/srv/configs:ro
