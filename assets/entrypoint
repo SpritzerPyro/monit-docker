@@ -20,7 +20,7 @@ function create_monitrc() {
   echo "set onreboot ${onreboot}" >> "${target}"
   echo "set statefile /srv/run/.monit.state" >> "${target}"
   echo "" >> "${target}"
-  echo "set httpd port 2812" >> "${target}"
+  echo "set httpd port 80" >> "${target}"
   echo "  allow ${user}:${pass}" >> "${target}"
   echo "" >> "${target}"
   echo 'check system $HOST' >> "${target}"

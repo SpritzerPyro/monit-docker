@@ -27,6 +27,7 @@ RUN apk --no-cache add \
   docker-compose \
   g++ \
   gcc \
+  libcap \
   make \
   openssl-dev \
   tzdata \
@@ -40,9 +41,9 @@ RUN cd /srv/tmp && \
   make install && \
   rm -rf /srv/tmp/monit-${monit_version}
 
-RUN addgroup monit docker && addgroup monit ping
+RUN setcap 'cap_net_bind_service=+ep' /usr/local/bin/monit
 
-EXPOSE 2812
+RUN addgroup monit docker && addgroup monit ping
 
 COPY assets/entrypoint /usr/local/bin/entrypoint
 COPY assets/healthcheck /usr/local/bin/healthcheck
@@ -59,6 +60,9 @@ HEALTHCHECK \
 ENTRYPOINT [ "entrypoint" ]
 
 VOLUME [ "/srv/run" ]
+
+EXPOSE 80/tcp
+EXPOSE 443/tcp
 
 USER monit
 
